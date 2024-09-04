@@ -10,24 +10,23 @@ public class Cliente {
         this.contas = contas;
     }
 
-    public String getNome() {
-        return nome;
-    }
-
     public void setNome(String nome) {
         this.nome = nome;
     }
 
+    public void setContas(List<Conta> contas) {
+        this.contas = contas;
+    }
 
-    public void atualizarDados(String novoNome) {
-        this.nome = novoNome;
+    public void adicionarConta(Conta conta) {
+        this.contas.add(conta);
     }
 
     public double consultarSaldoTotal() {
         return contas.stream().mapToDouble(Conta::getSaldo).sum();
     }
 
-    public void setContas(List contas) {
-
+    public void atualizarDados(String novoNome) {
+        this.nome = novoNome;
     }
 }

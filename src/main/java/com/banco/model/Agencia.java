@@ -3,51 +3,31 @@ package main.java.com.banco.model;
 import java.util.List;
 
 public class Agencia {
-    private int id;
+    private List<Conta> contas;
+    private int numero;
     private Banco banco;
     private String endereco;
-    private List<Conta> contas;
 
-    public Agencia(int numero, Banco banco, String endereco, List<Conta> contas) {
-        this.id = numero;
+    public Agencia(List<Conta> contas, int numero, Banco banco, String endereco) {
+        this.contas = contas;
+        this.numero = numero;
         this.banco = banco;
         this.endereco = endereco;
-        this.contas = contas;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public Banco getBanco() {
-        return banco;
-    }
-
-    public String getEndereco() {
-        return endereco;
-    }
-
-    public List<Conta> getContas() {
-        return contas;
-    }
-
-    public List<Conta> listaDeContas() {
-        return contas;
-    }
-
-    public void adicionarConta(Conta conta) {
-        contas.add(conta);
+    public Conta buscarContaPorId(int id) {
+        return contas.stream().filter(conta -> conta.getId() == id).findFirst().orElse(null);
     }
 
     public void removerConta(Conta conta) {
         contas.remove(conta);
     }
 
-    public void buscarContaPorId(int id) {
-        for (Conta conta : contas) {
-            if (conta.getId() == id) {
-                System.out.println(conta);
-            }
-        }
+    public void adicionarConta(Conta conta) {
+        contas.add(conta);
+    }
+
+    public void listaDeContas() {
+        contas.forEach(conta -> System.out.println("Conta ID: " + conta.getId() + ", Saldo: " + conta.getSaldo()));
     }
 }

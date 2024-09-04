@@ -1,49 +1,21 @@
 package main.java.com.banco.model;
 
-import main.java.com.banco.repository.IConta;
+import java.util.ArrayList;
+import java.util.List;
 
-public abstract class Conta implements IConta {
+public abstract class Conta {
+    private static int contadorDeIds = 1;
 
-    private static final int AGENCIA_PADRAO = 1;
-    private static int SEQUENCIAL = 1;
-
-    protected int agencia;
-    protected int id;
-    protected double saldo;
-    protected Cliente cliente;
+    private int id;
+    private Cliente cliente;
+    private double saldo;
+    private List<String> extrato;
 
     public Conta(Cliente cliente) {
-        this.agencia = Conta.AGENCIA_PADRAO;
-        this.id = SEQUENCIAL++;
+        this.id = contadorDeIds++;
         this.cliente = cliente;
-    }
-
-    @Override
-    public void sacar(double valor) {
-        if (saldo >= valor) {
-            saldo -= valor;
-        } else {
-            System.out.println("Saldo insuficiente para saque.");
-        }
-    }
-
-    @Override
-    public void depositar(double valor) {
-        saldo += valor;
-    }
-
-    @Override
-    public void transferir(double valor, IConta contaDestino) {
-        if (saldo >= valor) {
-            this.sacar(valor);
-            contaDestino.depositar(valor);
-        } else {
-            System.out.println("Saldo insuficiente para transferência.");
-        }
-    }
-
-    public int getAgencia() {
-        return agencia;
+        this.saldo = 0.0;
+        this.extrato = new ArrayList<>();
     }
 
     public int getId() {
@@ -54,15 +26,34 @@ public abstract class Conta implements IConta {
         return saldo;
     }
 
-    protected void imprimirInfosComuns() {
-        System.out.printf("Titular: %s%n", this.cliente.getNome());
-        System.out.printf("Agencia: %d%n", this.agencia);
-        System.out.printf("Numero: %d%n", this.id);
-        System.out.printf("Saldo: %.2f%n", this.saldo);
+    protected void adicionarExtrato(String operacao) {
+        extrato.add(operacao);
     }
 
     public void consultarExtrato() {
-        System.out.println("=== Extrato da Conta ===");
-        imprimirInfosComuns();
+        System.out.println("Extrato da Conta " + id + ": ");
+        extrato.forEach(System.out::println);
+    }
+
+    public void depositar(double valor) {
+        saldo += valor;
+        adicionarExtrato("Depósito: +" + valor);
+    }
+
+    public void sacar(double valor) {
+        saldo -= valor;
+        adicionarExtrato("Saque: -" + valor);
+    }
+
+    public void transferir(double valor, Conta destino) {
+        this.sacar(valor);
+        destino.depositar(valor);
+        adicionarExtrato("Transferência para Conta " + destino.getId() + ": -" + valor);
+        destino.adicionarExtrato("Transferência recebida da Conta " + this.getId() + ": +" + valor);
+    }
+
+    public abstract void imprimirExtrato();
+
+    protected void imprimirInfosComuns() {
     }
 }

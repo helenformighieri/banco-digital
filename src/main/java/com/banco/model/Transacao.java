@@ -4,72 +4,40 @@ import java.util.Date;
 
 public class Transacao {
     private int id;
-    private String tipoConta;
+    private String tipo;
     private Date data;
-    private int contaOrigem;
-    private int contaDestino;
+    private int contaOrigemId;
+    private int contaDestinoId;
     private double valor;
     private Banco banco;
 
-    public Transacao(int id, String tipoConta, Date data, int contaOrigem, int contaDestino, double valor, Banco banco) {
+    public Transacao(int id, String tipo, Date data, int contaOrigemId, int contaDestinoId, double valor, Banco banco) {
         this.id = id;
-        this.tipoConta = tipoConta;
+        this.tipo = tipo;
         this.data = data;
-        this.contaOrigem = contaOrigem;
-        this.contaDestino = contaDestino;
+        this.contaOrigemId = contaOrigemId;
+        this.contaDestinoId = contaDestinoId;
         this.valor = valor;
         this.banco = banco;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public String getTipoConta() {
-        return tipoConta;
-    }
-
-    public Date getData() {
-        return data;
-    }
-
-    public int getContaOrigem() {
-        return contaOrigem;
-    }
-
-    public int getContaDestino() {
-        return contaDestino;
-    }
-
-    public double getValor() {
-        return valor;
-    }
-
     public void executarTransacao() {
-        Conta origem = banco.getContas().stream()
-                .filter(conta -> conta.getId() == contaOrigem)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Conta de origem não encontrada"));
-
-        Conta destino = banco.getContas().stream()
-                .filter(conta -> conta.getId() == contaDestino)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Conta de destino não encontrada"));
-
-        origem.transferir(valor, destino);
+        Conta contaOrigem = banco.buscarContaPorId(contaOrigemId);
+        Conta contaDestino = banco.buscarContaPorId(contaDestinoId);
+        if (contaOrigem != null && contaDestino != null) {
+            contaOrigem.sacar(valor);
+            contaDestino.depositar(valor);
+            System.out.println("Transação realizada: " + tipo + " de R$" + valor + " da conta " + contaOrigemId + " para a conta " + contaDestinoId);
+        }
     }
 
     public void estornarTransacao() {
-        Conta origem = banco.getContas().stream()
-                .filter(conta -> conta.getId() == contaOrigem)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Conta de origem não encontrada"));
-
-        Conta destino = banco.getContas().stream()
-                .filter(conta -> conta.getId() == contaDestino)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Conta de destino não encontrada"));
-
-        destino.transferir(valor, origem);
+        Conta contaOrigem = banco.buscarContaPorId(contaOrigemId);
+        Conta contaDestino = banco.buscarContaPorId(contaDestinoId);
+        if (contaOrigem != null && contaDestino != null) {
+            contaDestino.sacar(valor);
+            contaOrigem.depositar(valor);
+            System.out.println("Transação estornada: " + tipo + " de R$" + valor + " da conta " + contaDestinoId + " para a conta " + contaOrigemId);
+        }
     }
 }
